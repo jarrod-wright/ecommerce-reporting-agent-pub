@@ -14,11 +14,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 README = REPO_ROOT / "README.md"
 
 REQUIRED_SECTIONS = [
-    "Status",
+    "Highlights",
     "Quickstart",
     "Architecture",
     "Security",
-    "Crown jewels",
+    "Project scope & status",
     "Known limitations",
     "License",
 ]
