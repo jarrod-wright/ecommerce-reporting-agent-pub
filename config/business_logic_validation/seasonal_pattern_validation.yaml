@@ -1,0 +1,34 @@
+dataset_config:
+  baseline_revenue: 50000
+  customers_count: 1000
+  orders_per_customer: 10
+  peak_months:
+  - 11
+  - 12
+  peak_multiplier: 2.5
+  revenue_pattern: seasonal
+  time_period_months: 12
+description: Holiday season revenue analysis
+expected_insights:
+- Strong seasonal pattern detected
+- Holiday season shows 250% revenue increase
+- November and December peak months identified
+- Recommend inventory preparation for Q4
+expected_pattern:
+  baseline_revenue: 50000
+  peak_months:
+  - 11
+  - 12
+  peak_multiplier: 2.5
+  type: seasonal
+scenario_name: seasonal_pattern_validation
+validation_criteria:
+- expected_value: true
+  metric: seasonality_detection
+- expected_value:
+  - 11
+  - 12
+  metric: peak_identification_accuracy
+- expected_value: 2.5
+  metric: peak_magnitude_accuracy
+  tolerance: 0.3

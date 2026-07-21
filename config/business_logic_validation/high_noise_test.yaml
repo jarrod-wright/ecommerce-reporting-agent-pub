@@ -1,0 +1,20 @@
+dataset_config:
+  customers_count: 1000
+  orders_per_customer: 5
+  time_period_months: 12
+description: Default configuration for high_noise_test
+expected_insights:
+- Pattern analysis completed
+- Data validation successful
+- Insights generated successfully
+expected_pattern:
+  pattern_strength: 0.8
+  type: generic
+scenario_name: high_noise_test
+validation_criteria:
+- expected_value: true
+  metric: data_completeness
+- expected_value: true
+  metric: pattern_detection
+- expected_value: true
+  metric: insight_generation

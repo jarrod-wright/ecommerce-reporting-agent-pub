@@ -1,0 +1,95 @@
+### **The Definitive Technical Debt Ledger**
+
+**File Path:** `docs/01_architecture/technical_debt_ledger.yml`
+**Purpose:** This document provides a structured, machine-readable inventory of all known, intentionally deferred technical work required to elevate the project to a "pinnacle" v1.0+ standard.
+
+```yaml
+# Technical Debt Ledger for the E-commerce Performance Report Agent
+# Document ID: TDL-ECR-V1.0
+# This document is the single source of truth for all planned, deferred engineering work.
+# It is intended to be parsed and analyzed by our AI Coding Partner.
+
+technical_debt_items:
+  - id: "TDI-001"
+    title: "Per-Node Context Engineering"
+    description: >
+      Currently, several LangGraph nodes receive the full `ReportingAgentState` object
+      but only use a small subset of its fields. This creates unnecessary coupling
+      and cognitive overhead. The goal is to refactor these nodes to be more
+      explicit and efficient by defining specific Pydantic input models for each.
+    status: "PENDING"
+    sprint_target: "Pinnacle Audit - Sprint 2 (Resilient Core)"
+    affected_components:
+      - file_path: "agent/graph/generate_visualizations_node.py"
+        function_name: "generate_visualizations_node"
+        current_input_schema: "ReportingAgentState"
+        required_fields:
+          - "processed_dataframe_json"
+          - "report_config"
+        proposed_input_schema: "VisualizationNodeInput(BaseModel)"
+      - file_path: "agent/graph/compile_report_node.py"
+        function_name: "compile_report_node"
+        current_input_schema: "ReportingAgentState"
+        required_fields:
+          - "generated_insights"
+          - "visualization_filepaths"
+          - "report_config"
+        proposed_input_schema: "CompileReportNodeInput(BaseModel)"
+      - file_path: "agent/graph/self_critique_node.py"
+        function_name: "self_critique_node"
+        current_input_schema: "ReportingAgentState"
+        required_fields:
+          - "processed_dataframe_json"
+          - "generated_insights"
+        proposed_input_schema: "CritiqueNodeInput(BaseModel)"
+
+  - id: "TDI-002"
+    title: "XAI Prompt Architecture Optimization"
+    description: >
+      The current prompts for the XAI "Trust Sandwich" nodes (`pre_flight_check`
+      and `self_critique`) are functional but represent a v1 implementation.
+      They can be significantly hardened and improved by incorporating more
+      sophisticated, multi-step reasoning patterns like the "Skeptical CFO"
+      self-critique loop.
+    status: "PENDING"
+    sprint_target: "Pinnacle Audit - Sprint 3 (Agentic Shield)"
+    affected_components:
+      - file_path: "agent/graph/pre_flight_check_node.py"
+        function_name: "pre_flight_check_node"
+        current_prompt_strategy: "Single-shot data quality analysis."
+        proposed_improvement: "Implement a chain-of-thought prompt that first checks for schema, then for outliers, then for inconsistencies, before generating a final score."
+      - file_path: "agent/graph/self_critique_node.py"
+        function_name: "self_critique_node"
+        current_prompt_strategy: "Single-shot critique of generated insights."
+        proposed_improvement: "Implement a multi-persona, 'Analyst -> CFO -> Strategist' prompt chain to produce a more robust and defensible confidence score and critique."
+
+  - id: "TDI-003"
+    title: "Implement 'Generative UI' Pattern"
+    description: >
+      A high-value, future-focused enhancement where the agent's LLM not only
+      generates insights but also suggests the optimal Streamlit component to
+      display that insight. This would make the frontend UI dynamically
+      responsive to the nature of the data.
+    status: "DEFERRED"
+    sprint_target: "Post-v1.0 / v2.0 Roadmap"
+    affected_components:
+      - file_path: "agent/models/insights.py"
+        proposed_change: "Add a new field `suggested_streamlit_component: str` to the `ReportInsights` model."
+      - file_path: "streamlit_app/app.py"
+        proposed_change: "Refactor the UI rendering logic to dynamically select and render components based on the value of the new field."
+
+  - id: "TDI-004"
+    title: "Interactive XAI Drill-Down Dashboard"
+    description: >
+      The core of a premium, recurring "AI Governance" service. This involves
+      building a separate, full-featured Streamlit dashboard that allows clients
+      to interactively explore the `LangSmith` traces and `PostgresSaver` audit
+      logs for their reports.
+    status: "DEFERRED"
+    sprint_target: "Post-v1.0 / v2.0 Roadmap"
+    affected_components:
+      - "New Project: `xai_dashboard_service`"
+      - "Requires integration with `LangSmith` API."
+      - "Requires read-only access to the `PostgresSaver` database."
+
+```

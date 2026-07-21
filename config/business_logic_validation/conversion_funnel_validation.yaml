@@ -1,0 +1,26 @@
+dataset_config:
+  average_order_value: 125.0
+  conversion_rate: 0.03
+  customer_acquisition_cost: 25.0
+  sessions_count: 10000
+description: Metrics calculation accuracy validation
+expected_insights:
+- 'Conversion rate: 3.0%'
+- 'Average order value: $125.00'
+- 'Customer acquisition cost efficiency ratio: 5:1'
+- Recommend conversion optimization focus
+expected_pattern:
+  average_order_value: 125.0
+  cac_ratio: 5.0
+  conversion_rate: 0.03
+  type: conversion_funnel
+scenario_name: conversion_funnel_validation
+validation_criteria:
+- expected_value: 0.03
+  metric: conversion_rate_accuracy
+  tolerance: 0.005
+- expected_value: 125.0
+  metric: aov_accuracy
+  tolerance: 10.0
+- expected_value: true
+  metric: cac_calculation_correctness

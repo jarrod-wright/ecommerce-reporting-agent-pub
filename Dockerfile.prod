@@ -1,0 +1,72 @@
+# Production-ready multi-stage Dockerfile implementing Twelve-Factor App principles
+# Factors II (Dependencies), V (Build/Release/Run), IX (Disposability)
+
+# ================================
+# Stage 1: Builder Stage
+# ================================
+FROM python:3.11-slim-bookworm AS builder
+
+# Install system dependencies for building
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install --no-cache-dir poetry==1.8.3
+
+# Configure Poetry to not create virtual env (we'll manage it ourselves)
+ENV POETRY_VENV_IN_PROJECT=1 \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+# Set work directory
+WORKDIR /app
+
+# Copy dependency files (Factor II: Dependencies)
+COPY pyproject.toml poetry.lock ./
+
+# Install production dependencies into virtual environment
+RUN poetry install --no-dev --no-root && \
+    rm -rf $POETRY_CACHE_DIR
+
+# ================================
+# Stage 2: Production Runtime Stage
+# ================================
+FROM python:3.11-slim-bookworm
+
+# Create non-root user with specific UID/GID for security
+RUN groupadd --gid 1001 appuser && \
+    useradd --uid 1001 --gid appuser --shell /bin/bash --create-home appuser
+
+# Set work directory
+WORKDIR /app
+
+# Copy virtual environment from builder stage
+COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
+
+# Copy application source code (source lives under src/; build context is repo root)
+COPY --chown=appuser:appuser src/agent/ ./agent/
+COPY --chown=appuser:appuser src/streamlit_app/ ./streamlit_app/
+COPY --chown=appuser:appuser templates/ ./templates/
+COPY --chown=appuser:appuser src/main.py ./
+
+# Set PATH to include virtual environment binaries
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH="/app" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Switch to non-root user (Factor IX: Disposability - security)
+USER appuser
+
+# Expose port
+EXPOSE 8080
+
+# Health check for container orchestration
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:8080/health', timeout=10)"
+
+# Use exec form for proper signal handling (Factor IX: Disposability)
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--timeout-graceful-shutdown", "25"]

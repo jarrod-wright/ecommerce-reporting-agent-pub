@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ report_config.report_title or "Performance Report" }}</title>
+<style>
+  /* ---- Bundled fonts (deterministic offline render; resolved via base_url) ---- */
+  @font-face { font-family: 'Inter'; src: url('fonts/Inter-Variable.ttf'); }
+  @font-face { font-family: 'Poppins'; font-weight: 500; src: url('fonts/Poppins-Medium.ttf'); }
+  @font-face { font-family: 'Poppins'; font-weight: 600; src: url('fonts/Poppins-SemiBold.ttf'); }
+
+  /* ---- Design tokens (ERA High-Trust palette, WCAG-AA) ---- */
+  :root {
+    --primary: #2563EB;
+    --text: #1A202C;
+    --text-secondary: #475569;
+    --border: #CBD5E1;
+    --surface-alt: #F8FAFC;
+    --success: #16A34A;
+    --warning: #F59E0B;
+    --error: #DC2626;
+  }
+
+  @page {
+    size: A4;
+    margin: 1.7cm 1.9cm 1.9cm 1.9cm;
+    @bottom-left { content: "{{ report_config.report_title or 'Performance Report' }}"; font-family: 'Inter'; font-size: 7.5pt; color: #94A3B8; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); font-family: 'Inter'; font-size: 7.5pt; color: #94A3B8; }
+  }
+
+  html { font-family: 'Inter', sans-serif; color: var(--text); font-size: 10.5pt; line-height: 1.55; }
+  body { margin: 0; }
+
+  /* ---- Header ---- */
+  .report-header { border-bottom: 3px solid var(--primary); padding-bottom: 14px; margin-bottom: 26px; }
+  .eyebrow { font-family: 'Inter'; font-weight: 500; font-size: 8.5pt; letter-spacing: 1.4px; text-transform: uppercase; color: var(--primary); margin-bottom: 6px; }
+  h1 { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 25pt; letter-spacing: -0.4px; line-height: 1.12; margin: 0 0 8px 0; color: var(--text); }
+  .header-meta { font-size: 9.5pt; color: var(--text-secondary); }
+
+  /* ---- Section scaffolding ---- */
+  section { margin-bottom: 24px; }
+  h2 { font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 13pt; color: var(--text); margin: 0 0 12px 0; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+
+  /* ---- KPI metric band (BLUF) ---- WeasyPrint-safe: inline-block cards, no CSS-grid auto-fit ---- */
+  .metric-grid { font-size: 0; margin: 0 -1%; }
+  .metric-card {
+    display: inline-block; vertical-align: top; width: 31.33%; margin: 0 1% 16px 1%;
+    box-sizing: border-box; padding: 14px 16px; background: var(--surface-alt);
+    border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 6px;
+  }
+  .metric-value { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 18pt; color: var(--text); line-height: 1.1; }
+  .metric-label { font-family: 'Inter'; font-weight: 500; font-size: 8pt; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-secondary); margin-top: 5px; }
+
+  /* ---- Analysis + chart ---- */
+  .summary { font-size: 10.5pt; color: var(--text); margin: 0 0 14px 0; }
+  .chart-wrap { text-align: center; margin: 10px 0 4px 0; padding: 10px; background: #FFFFFF; border: 1px solid var(--border); border-radius: 6px; }
+  .chart-wrap img { max-width: 100%; height: auto; }
+
+  /* ---- Recommendation cards (diagnose -> prescribe; NO commercial CTA) ---- */
+  .reco-card { padding: 12px 16px 12px 14px; margin-bottom: 10px; background: var(--surface-alt); border: 1px solid var(--border); border-left: 3px solid var(--success); border-radius: 6px; }
+  .reco-card { -weasy-break-inside: avoid; break-inside: avoid; page-break-inside: avoid; }
+  .reco-title { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 10.5pt; color: var(--text); }
+  .reco-rationale { font-size: 9.5pt; color: var(--text-secondary); margin-top: 3px; }
+
+  /* ---- Data-quality appendix (de-emphasised) ---- */
+  .dq-section h2 { color: var(--text-secondary); }
+  .dq-note { font-size: 9.5pt; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+
+  .empty { font-size: 9.5pt; color: #94A3B8; font-style: italic; }
+</style>
+</head>
+<body>
+
+  <header class="report-header">
+    <div class="eyebrow">E-commerce Performance Report</div>
+    <h1>{{ report_config.report_title or "Performance Report" }}</h1>
+    {% if report_config.date_range %}<div class="header-meta">{{ report_config.date_range }}</div>{% endif %}
+  </header>
+
+  {% if insights.summary %}
+  <section class="summary-section">
+    <h2>Executive Summary</h2>
+    <p class="summary">{{ insights.summary }}</p>
+  </section>
+  {% endif %}
+
+  {% if insights.key_metrics %}
+  <section class="kpi-section">
+    <h2>Key Performance Metrics</h2>
+    <div class="metric-grid">
+      {% for name, value in insights.key_metrics.items() %}
+      <div class="metric-card">
+        <div class="metric-value">{{ value|format_metric(name) }}</div>
+        <div class="metric-label">{{ name|replace("_", " ")|title }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if visualizations %}
+  <section class="chart-section">
+    <h2>Trends</h2>
+    {% for viz in visualizations %}
+    <div class="chart-wrap"><img src="{{ viz }}" alt="Performance chart"></div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if insights.recommendations %}
+  <section class="reco-section">
+    <h2>Recommendations</h2>
+    {% for rec in insights.recommendations %}
+      {% if rec is mapping %}
+      <div class="reco-card">
+        <div class="reco-title">{{ rec.title }}</div>
+        {% if rec.rationale %}<div class="reco-rationale">{{ rec.rationale }}</div>{% endif %}
+      </div>
+      {% else %}
+      <div class="reco-card"><div class="reco-title">{{ rec }}</div></div>
+      {% endif %}
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if insights.data_quality_notes %}
+  <section class="dq-section">
+    <h2>Data Quality Notes</h2>
+    <div class="dq-note">{{ insights.data_quality_notes }}</div>
+  </section>
+  {% endif %}
+
+</body>
+</html>

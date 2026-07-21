@@ -1,0 +1,333 @@
+{
+  "test_suite": "comprehensive_profile_validation",
+  "profiles_tested": 5,
+  "profiles": {
+    "high_growth_startup": {
+      "profile_name": "high_growth_startup",
+      "tests": {
+        "shopify_schema": {
+          "profile_name": "high_growth_startup",
+          "test_name": "shopify_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required fields present",
+            "total_price_type": "\u2713 total_price is string type (Polars compatible)",
+            "timestamps": "\u2713 All created_at values are valid ISO timestamps",
+            "positive_prices": "\u2713 All prices are positive",
+            "referential_integrity": "\u2713 All orders reference valid customers"
+          }
+        },
+        "ga4_schema": {
+          "profile_name": "high_growth_startup",
+          "test_name": "ga4_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required GA4 fields present",
+            "date_format": "\u2713 All dates match YYYY-MM-DD format",
+            "positive_page_views": "\u2713 All page_views are positive",
+            "positive_duration": "\u2713 All durations are positive",
+            "device_categories": "\u2713 All device categories are valid"
+          }
+        },
+        "era_compatibility": {
+          "test_name": "era_state_compatibility",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "data_assignment": "\u2713 Data successfully assigned to ERA state",
+            "processing": "\u2713 Data processing completed successfully",
+            "unified_data": "\u2713 Generated 365 unified records",
+            "unified_columns": "\u2713 All required unified columns present"
+          }
+        },
+        "performance": {
+          "test_name": "performance_requirements",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "processing_speed": "\u2713 Processing completed in 0.142s (<30s required)",
+            "memory_usage": "\u2713 Estimated memory usage: 16.2MB (<100MB)"
+          }
+        },
+        "data_quality": {
+          "test_name": "data_quality_metrics",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "shopify_completeness": "\u2713 Shopify data 100.0% complete",
+            "ga4_completeness": "\u2713 GA4 data 100.0% complete",
+            "referential_consistency": "\u2713 Referential integrity 100.0%"
+          }
+        }
+      },
+      "overall_passed": true,
+      "error_count": 0,
+      "validation_count": 19
+    },
+    "stable_enterprise": {
+      "profile_name": "stable_enterprise",
+      "tests": {
+        "shopify_schema": {
+          "profile_name": "stable_enterprise",
+          "test_name": "shopify_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required fields present",
+            "total_price_type": "\u2713 total_price is string type (Polars compatible)",
+            "timestamps": "\u2713 All created_at values are valid ISO timestamps",
+            "positive_prices": "\u2713 All prices are positive",
+            "referential_integrity": "\u2713 All orders reference valid customers"
+          }
+        },
+        "ga4_schema": {
+          "profile_name": "stable_enterprise",
+          "test_name": "ga4_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required GA4 fields present",
+            "date_format": "\u2713 All dates match YYYY-MM-DD format",
+            "positive_page_views": "\u2713 All page_views are positive",
+            "positive_duration": "\u2713 All durations are positive",
+            "device_categories": "\u2713 All device categories are valid"
+          }
+        },
+        "era_compatibility": {
+          "test_name": "era_state_compatibility",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "data_assignment": "\u2713 Data successfully assigned to ERA state",
+            "processing": "\u2713 Data processing completed successfully",
+            "unified_data": "\u2713 Generated 364 unified records",
+            "unified_columns": "\u2713 All required unified columns present"
+          }
+        },
+        "performance": {
+          "test_name": "performance_requirements",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "processing_speed": "\u2713 Processing completed in 0.157s (<30s required)",
+            "memory_usage": "\u2713 Estimated memory usage: 16.2MB (<100MB)"
+          }
+        },
+        "data_quality": {
+          "test_name": "data_quality_metrics",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "shopify_completeness": "\u2713 Shopify data 100.0% complete",
+            "ga4_completeness": "\u2713 GA4 data 100.0% complete",
+            "referential_consistency": "\u2713 Referential integrity 100.0%"
+          }
+        }
+      },
+      "overall_passed": true,
+      "error_count": 0,
+      "validation_count": 19
+    },
+    "seasonal_business": {
+      "profile_name": "seasonal_business",
+      "tests": {
+        "shopify_schema": {
+          "profile_name": "seasonal_business",
+          "test_name": "shopify_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required fields present",
+            "total_price_type": "\u2713 total_price is string type (Polars compatible)",
+            "timestamps": "\u2713 All created_at values are valid ISO timestamps",
+            "positive_prices": "\u2713 All prices are positive",
+            "referential_integrity": "\u2713 All orders reference valid customers"
+          }
+        },
+        "ga4_schema": {
+          "profile_name": "seasonal_business",
+          "test_name": "ga4_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required GA4 fields present",
+            "date_format": "\u2713 All dates match YYYY-MM-DD format",
+            "positive_page_views": "\u2713 All page_views are positive",
+            "positive_duration": "\u2713 All durations are positive",
+            "device_categories": "\u2713 All device categories are valid"
+          }
+        },
+        "era_compatibility": {
+          "test_name": "era_state_compatibility",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "data_assignment": "\u2713 Data successfully assigned to ERA state",
+            "processing": "\u2713 Data processing completed successfully",
+            "unified_data": "\u2713 Generated 366 unified records",
+            "unified_columns": "\u2713 All required unified columns present"
+          }
+        },
+        "performance": {
+          "test_name": "performance_requirements",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "processing_speed": "\u2713 Processing completed in 0.140s (<30s required)",
+            "memory_usage": "\u2713 Estimated memory usage: 16.2MB (<100MB)"
+          }
+        },
+        "data_quality": {
+          "test_name": "data_quality_metrics",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "shopify_completeness": "\u2713 Shopify data 100.0% complete",
+            "ga4_completeness": "\u2713 GA4 data 100.0% complete",
+            "referential_consistency": "\u2713 Referential integrity 100.0%"
+          }
+        }
+      },
+      "overall_passed": true,
+      "error_count": 0,
+      "validation_count": 19
+    },
+    "data_with_pii": {
+      "profile_name": "data_with_pii",
+      "tests": {
+        "shopify_schema": {
+          "profile_name": "data_with_pii",
+          "test_name": "shopify_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required fields present",
+            "total_price_type": "\u2713 total_price is string type (Polars compatible)",
+            "timestamps": "\u2713 All created_at values are valid ISO timestamps",
+            "positive_prices": "\u2713 All prices are positive",
+            "referential_integrity": "\u2713 All orders reference valid customers"
+          }
+        },
+        "ga4_schema": {
+          "profile_name": "data_with_pii",
+          "test_name": "ga4_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required GA4 fields present",
+            "date_format": "\u2713 All dates match YYYY-MM-DD format",
+            "positive_page_views": "\u2713 All page_views are positive",
+            "positive_duration": "\u2713 All durations are positive",
+            "device_categories": "\u2713 All device categories are valid"
+          }
+        },
+        "era_compatibility": {
+          "test_name": "era_state_compatibility",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "data_assignment": "\u2713 Data successfully assigned to ERA state",
+            "processing": "\u2713 Data processing completed successfully",
+            "unified_data": "\u2713 Generated 364 unified records",
+            "unified_columns": "\u2713 All required unified columns present"
+          }
+        },
+        "performance": {
+          "test_name": "performance_requirements",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "processing_speed": "\u2713 Processing completed in 0.149s (<30s required)",
+            "memory_usage": "\u2713 Estimated memory usage: 16.2MB (<100MB)"
+          }
+        },
+        "data_quality": {
+          "test_name": "data_quality_metrics",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "shopify_completeness": "\u2713 Shopify data 100.0% complete",
+            "ga4_completeness": "\u2713 GA4 data 100.0% complete",
+            "referential_consistency": "\u2713 Referential integrity 100.0%"
+          }
+        }
+      },
+      "overall_passed": true,
+      "error_count": 0,
+      "validation_count": 19
+    },
+    "edge_case_scenarios": {
+      "profile_name": "edge_case_scenarios",
+      "tests": {
+        "shopify_schema": {
+          "profile_name": "edge_case_scenarios",
+          "test_name": "shopify_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required fields present",
+            "total_price_type": "\u2713 total_price is string type (Polars compatible)",
+            "timestamps": "\u2713 All created_at values are valid ISO timestamps",
+            "positive_prices": "\u2713 All prices are positive",
+            "referential_integrity": "\u2713 All orders reference valid customers"
+          }
+        },
+        "ga4_schema": {
+          "profile_name": "edge_case_scenarios",
+          "test_name": "ga4_schema_compliance",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "required_fields": "\u2713 All required GA4 fields present",
+            "date_format": "\u2713 All dates match YYYY-MM-DD format",
+            "positive_page_views": "\u2713 All page_views are positive",
+            "positive_duration": "\u2713 All durations are positive",
+            "device_categories": "\u2713 All device categories are valid"
+          }
+        },
+        "era_compatibility": {
+          "test_name": "era_state_compatibility",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "data_assignment": "\u2713 Data successfully assigned to ERA state",
+            "processing": "\u2713 Data processing completed successfully",
+            "unified_data": "\u2713 Generated 366 unified records",
+            "unified_columns": "\u2713 All required unified columns present"
+          }
+        },
+        "performance": {
+          "test_name": "performance_requirements",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "processing_speed": "\u2713 Processing completed in 0.149s (<30s required)",
+            "memory_usage": "\u2713 Estimated memory usage: 16.2MB (<100MB)"
+          }
+        },
+        "data_quality": {
+          "test_name": "data_quality_metrics",
+          "passed": true,
+          "errors": [],
+          "validations": {
+            "shopify_completeness": "\u2713 Shopify data 100.0% complete",
+            "ga4_completeness": "\u2713 GA4 data 100.0% complete",
+            "referential_consistency": "\u2713 Referential integrity 100.0%"
+          }
+        }
+      },
+      "overall_passed": true,
+      "error_count": 0,
+      "validation_count": 19
+    }
+  },
+  "summary": {
+    "total_tests": 25,
+    "passed_tests": 25,
+    "failed_tests": 0,
+    "profiles_passed": 5,
+    "profiles_failed": 0
+  }
+}

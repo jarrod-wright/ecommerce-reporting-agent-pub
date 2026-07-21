@@ -1,0 +1,14 @@
+# One-command deploy: `docker compose up --build`.
+# Secrets are NEVER inline — they are read from a local, gitignored `.env`
+# (copy `.env.example` to `.env` first). See README for details.
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: ecommerce-reporting-agent:latest
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

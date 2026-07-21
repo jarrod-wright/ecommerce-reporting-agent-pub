@@ -1,0 +1,15 @@
+# Python virtual environment
+/.venv
+
+# VS Code
+.vscode/
+
+# Local secrets/environment files
+.env
+
+# Generated demo output
+/output/
+
+# Python caches
+__pycache__/
+*.pyc

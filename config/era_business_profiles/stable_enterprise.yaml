@@ -1,0 +1,93 @@
+profile_name: "ERA Stable Enterprise Testing Dataset"
+
+global_settings:
+  seed: 1337
+  date_range:
+    start: "2024-01-01"
+    end: "2024-12-31"
+
+entities:
+  - entity_name: shopify_customers
+    count: 50000
+    field_schema:
+      customer_id:
+        provider: uuid
+      first_name:
+        provider: person.first_name
+      last_name:
+        provider: person.last_name
+      email:
+        provider: person.email
+      phone:
+        provider: person.telephone
+      created_at:
+        provider: datetime.datetime
+        start: 2023
+        end: 2024
+
+  - entity_name: shopify_orders
+    count_per_parent:
+      parent_entity: shopify_customers
+      distribution: normal
+      mean: 8
+      std_dev: 5
+      min: 1
+      max: 25
+    relationships:
+      - type: foreign_key
+        from_entity: shopify_customers
+        from_field: customer_id
+        to_field: customer_id
+    field_schema:
+      id:
+        provider: uuid
+      order_number:
+        provider: random.randint
+        a: 1000
+        b: 999999
+      created_at:
+        provider: datetime.datetime
+        start: 2024
+        end: 2024
+      total_price:
+        provider: numeric.float_number
+        distribution:
+          type: normal
+          mean: 350
+          std: 100
+          min: 5.0
+          max: 1000.0
+      financial_status:
+        provider: choice
+        items: [paid, pending, refunded]
+      fulfillment_status:
+        provider: choice
+        items: [fulfilled, unfulfilled, shipped]
+      customer_id:
+        provider: placeholder
+
+  - entity_name: ga4_sessions
+    count: 15000
+    field_schema:
+      date:
+        provider: datetime.date
+        start: 2024
+        end: 2024
+      device_category:
+        provider: choice
+        items: [desktop, mobile, tablet]
+        weights: [0.6, 0.35, 0.05]
+      page_views:
+        provider: random.randint
+        a: 1
+        b: 20
+      duration:
+        provider: random.randint
+        a: 30
+        b: 1800
+      sessions:
+        provider: choice
+        items: [1]
+      users:
+        provider: choice
+        items: [1]

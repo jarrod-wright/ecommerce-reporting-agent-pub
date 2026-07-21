@@ -1,0 +1,152 @@
+[tool.poetry]
+name = "ecommerce-reporting-agent"
+version = "0.1.0"
+description = "An AI agent to automate e-commerce performance reporting"
+authors = ["Jarrod Wright <248904332+jarrod-wright@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [
+    {include = "agent", from = "src"},
+    {include = "streamlit_app", from = "src"}, 
+    {include = "validation", from = "src"},
+    {include = "test_data_generator", from = "src"}
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+# --- Upgraded LangChain Ecosystem ---
+langchain = "^0.3.27"
+langgraph = "^0.6.6"
+langchain-anthropic = "^0.3.19"
+langsmith = "^0.4.16"
+langchain-google-genai = "^2.1.9"
+# --- Core Dependencies (Verified Versions) ---
+pydantic = "^2.11.7"
+pydantic-settings = "^2.10.1"  # For enterprise-grade settings management
+# Data & API Tools (core stack)
+polars = "^1.32.3"
+# Report Generation (core stack)
+jinja2 = "^3.1.6"
+plotly = "^6.3.0"
+kaleido = "0.2.1"  # Pinned: self-contained static renderer (no Chrome). v1.x requires a browser.
+psutil = "*" 
+weasyprint = "^66.0"
+# API Serving for Demo (core stack)
+fastapi = "^0.116.1"
+uvicorn = {extras = ["standard"], version = "^0.35.0"}
+streamlit = "^1.48.1"
+# Logging (core stack)
+structlog = "^25.4.0"
+# External API Libraries
+shopifyapi = ">=12.7.0"
+google-analytics-data = "^0.18.19" # Using a compatible constraint for the latest version 0.18.19
+# --- Hardening Sprint Dependencies ---
+slowapi = "^0.1.9"
+python-jose = {extras = ["cryptography"], version = "^3.5.0"}
+presidio-analyzer = "^2.2.359"
+bleach = "^6.2.0"
+presidio-anonymizer = "^2.2.359"
+mimesis = "^18.0.0"
+pandas = "^2.3.2"
+pyyaml = "^6.0.2"
+scipy = "^1.16.1"
+aiohttp = "^3.12.15"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+pytest-mock = "^3.14.1"
+ruff = "^0.12.10"
+pre-commit = "^4.3.0"
+pytest-asyncio = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "N", "I", "B"]
+
+# Pre-existing lint debt (task-ERA-S1 baseline: 3301 findings, 2345 auto-fixed).
+# The entries below scope the REMAINING legacy findings to the specific legacy
+# files that carry them, so `ruff check .` is honestly clean without mass-rewriting
+# working legacy code. Tracked for incremental cleanup, NOT silently suppressed
+# (see README "Known limitations"). task-ERA-S1-authored files (config.py, conftest,
+# tests/unit, tests/demo, demo/, request_signing.py) are intentionally ABSENT here
+# and pass under the full ruleset. `src/main.py`=["B008"] is the FastAPI
+# Depends()-in-default idiom (genuinely inapplicable to dependency injection).
+[tool.ruff.lint.per-file-ignores]
+"config/create_yaml_profiles.py" = ["E501"]
+"config/era_schema_mapper.py" = ["E501", "W293"]
+"config/generate_business_profiles.py" = ["E501"]
+"integration/pii_sanitization_era.py" = ["B007", "E501"]
+"monitoring/comprehensive_profiling_report.py" = ["B007", "E501"]
+"monitoring/resource_profiler.py" = ["E501"]
+"src/agent/clients/shopify_client.py" = ["E501"]
+"src/agent/graph/compile_report_node.py" = ["E501"]
+"src/agent/graph/execute_high_risk_tool_node.py" = ["W293"]
+"src/agent/graph/human_approval_node.py" = ["W293"]
+"src/agent/models/insights.py" = ["E501"]
+"src/agent/observability/logging_config.py" = ["E501", "W293"]
+"src/agent/tools/ga4_tools.py" = ["E501"]
+"src/agent/tools/shopify_tools.py" = ["E501"]
+"src/agent/tools/tool_router.py" = ["E501"]
+"src/agent/utils/test_data_generator/core/generator.py" = ["E501", "W291"]
+"src/agent/utils/test_data_generator/poc/minimal_generator.py" = ["W291"]
+"src/main.py" = ["B008"]
+"src/streamlit_app/components/main_interface.py" = ["E501"]
+"src/streamlit_app/components/results_dashboard.py" = ["E501", "W293"]
+"src/streamlit_app/streamlit_config.py" = ["W293"]
+"src/test_data_generator/core/generator.py" = ["E501", "W291"]
+"src/test_data_generator/poc/minimal_generator.py" = ["E501", "W291"]
+"src/validation/business_logic_self_critic.py" = ["E501", "F841"]
+"src/validation/enhanced_audit_foundation.py" = ["E501"]
+"src/validation/enhanced_ground_truth_engine.py" = ["B007", "E501"]
+"src/validation/evidence_verifier.py" = ["E501", "F841"]
+"src/validation/lean_attribution_engine.py" = ["E501", "E722"]
+"src/validation/local_challenger_model.py" = ["E501"]
+"src/validation/pragmatic_business_logic_validator.py" = ["E501"]
+"src/validation/structured_evidence_framework.py" = ["E501", "E722"]
+"src/validation/structured_insight_models.py" = ["E501"]
+"src/validation/trust_metrics_orchestrator.py" = ["E501"]
+"src/validation/validation_config_loader.py" = ["E501"]
+"tests/api/test_security.py" = ["B018", "E501", "W293"]
+"tests/frontend/components/test_main_interface.py" = ["E501"]
+"tests/frontend/components/test_results_dashboard.py" = ["E501"]
+"tests/frontend/test_components.py" = ["E501"]
+"tests/graph/test_compile_report_node.py" = ["E501"]
+"tests/models/test_insights.py" = ["E501"]
+"tests/observability/test_logging_config.py" = ["E501"]
+"tests/performance/adversarial_data_generator.py" = ["E501", "F841"]
+"tests/performance/adversarial_demo.py" = ["E501"]
+"tests/performance/comprehensive_benchmark.py" = ["E501"]
+"tests/performance/comprehensive_concurrent_benchmark.py" = ["E501", "F841"]
+"tests/performance/concurrent_load_testing.py" = ["E501", "E722"]
+"tests/performance/era_robustness_validator.py" = ["E501", "E722", "F841"]
+"tests/performance/run_adversarial_tests.py" = ["E501"]
+"tests/performance/scale_testing_framework.py" = ["E501", "W293"]
+"tests/performance/test_adversarial_data_generation.py" = ["E501"]
+"tests/performance/test_concurrent_load_simulation.py" = ["B007", "E501"]
+"tests/performance/test_era_robustness_framework.py" = ["E501", "E712"]
+"tests/performance/test_multi_scale_performance.py" = ["B007", "E501", "E712", "F841"]
+"tests/performance/test_resource_consumption_analysis.py" = ["E501"]
+"tests/test_data_profiles/comprehensive_validator.py" = ["E501"]
+"tests/test_data_profiles/era_compatibility_validator.py" = ["E501", "F841"]
+"tests/test_data_profiles/test_profile_validation.py" = ["B007", "E501"]
+"tests/test_era_schema_mapper.py" = ["E501"]
+"tests/test_pii_sanitization_integration.py" = ["E501"]
+"tests/tools/test_ga4_tools.py" = ["E501"]
+"tests/validation/test_enhanced_ground_truth_engine.py" = ["E501"]
+"tests/validation/test_integration_system.py" = ["E501"]
+"tests/validation/test_local_challenger_model.py" = ["B017", "E501"]
+"tests/validation/test_pragmatic_business_validation.py" = ["E501", "E712", "F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+addopts = "-v"
+testpaths = ["tests"]
+pythonpath = ["src"]

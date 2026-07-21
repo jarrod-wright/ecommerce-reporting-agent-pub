@@ -1,0 +1,29 @@
+dataset_config:
+  base_monthly_revenue: 50000
+  customers_count: 1000
+  noise_level: 0.05
+  orders_per_customer: 8
+  revenue_pattern: linear_growth
+  time_period_months: 12
+description: Linear revenue growth pattern validation
+expected_insights:
+- Revenue shows consistent month-over-month growth
+- Average monthly growth rate approximately 15%
+- Strong positive revenue trend identified
+- Recommend scaling successful marketing channels
+expected_pattern:
+  base_revenue: 50000
+  growth_rate: 0.15
+  trend_direction: positive
+  type: linear_growth
+scenario_name: revenue_growth_validation
+validation_criteria:
+- expected_value: 0.15
+  metric: monthly_growth_rate
+  tolerance: 0.05
+- expected_value: positive
+  metric: trend_direction
+- expected_value: 12
+  metric: total_months_data
+- expected_value: true
+  metric: revenue_consistency
