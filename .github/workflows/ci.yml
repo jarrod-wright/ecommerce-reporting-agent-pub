@@ -27,10 +27,17 @@ jobs:
       - name: Lint (ruff)
         run: poetry run ruff check .
 
-      - name: Test (pytest)
+      - name: Test (pytest, excluding the performance suite)
         # Test-suite security keys are provisioned by tests/conftest.py (demo
         # values) — no real secrets are required or referenced in CI.
-        run: poetry run pytest
+        # The performance suite runs in its own process below: it asserts
+        # process RSS budgets, and a shared pytest process accumulates every
+        # prior test's imports (including the scrubber's NLP model), which
+        # the budgets were never written to account for.
+        run: poetry run pytest --ignore=tests/performance
+
+      - name: Test (performance suite, isolated process)
+        run: poetry run pytest tests/performance
   compose:
     # Plan step 1 done-when: a CI job runs compose and a smoke request passes.
     runs-on: ubuntu-latest
