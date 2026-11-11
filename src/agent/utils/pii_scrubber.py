@@ -5,9 +5,10 @@ from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
-# en_core_web_sm (not presidio's en_core_web_lg default): the lg model loads
-# ~560MB RSS and breaks the multi-scale performance suite's memory budgets;
-# sm loads ~40MB and detects the same common entities. Built once per process.
+# en_core_web_sm (not presidio's en_core_web_lg default): the lg model
+# loads ~560MB RSS and breaks the multi-scale performance suite's memory
+# budgets; sm loads ~40MB and detects the same common entities. Built
+# once per process.
 _NLP_CONF = {
     "nlp_engine_name": "spacy",
     "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
