@@ -37,8 +37,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare .env from example
-        run: cp .env.example .env
+      - name: Prepare .env from example (demo secrets for the smoke container)
+        run: |
+          cp .env.example .env
+          # Fail-closed Settings demands non-placeholder secrets; CI uses
+          # throwaway demo values that never leave this container.
+          printf 'WEBHOOK_SECRET_KEY=demo-webhook-secret-not-a-real-credential\nJWT_SECRET_KEY=demo-jwt-secret-not-a-real-credential\n' >> .env
 
       - name: Build and start (docker compose up --build)
         run: docker compose up --build -d
