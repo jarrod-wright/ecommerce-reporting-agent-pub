@@ -4,6 +4,11 @@ Plan step 2 done-when: a test feeds synthetic PII and asserts it is absent
 from the output. The insights payload is the data-derived path into the PDF;
 this test captures the rendered HTML handed to WeasyPrint and checks the
 synthetic PII never survives.
+
+This test lives beside the other presidio-backed suite (test_pii_scrubber) in
+tests/utils: the scrubber loads a heavy NLP model on first use and the
+multi-scale performance suite measures process RSS, so this import must run
+AFTER tests/performance in the collection order.
 """
 
 import re
@@ -52,8 +57,9 @@ def test_report_render_scrubs_synthetic_pii_from_insights(mocker):
     # The scrubber replaces detected entities with type placeholders.
     assert "[PERSON]" in rendered
     assert "[EMAIL_ADDRESS]" in rendered
-    # Non-PII analytical text survives the scrub untouched.
-    assert "January cohort" in rendered
+    # Non-PII analytical text survives the scrub untouched. (The word
+    # "January" is correctly redacted as a DATE_TIME entity by presidio.)
+    assert "cohort underperformed" in rendered
     # The numeric metrics are never mistaken for PII and never scrubbed away.
     assert "800.99" in rendered or "801" in rendered or "801.00" in rendered
     # No leftover raw e-mail-looking string remains in the render.
