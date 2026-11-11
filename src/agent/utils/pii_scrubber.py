@@ -1,13 +1,18 @@
 from typing import Optional
 
 from presidio_analyzer import AnalyzerEngine
+from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
-# The analyzer loads a heavy NLP model on first construction (~hundreds of MB);
-# build it once per process and reuse it. The multi-scale performance suite
-# measures process RSS, so repeated engine construction would break the memory
-# budgets.
+# en_core_web_sm (not presidio's en_core_web_lg default): the lg model loads
+# ~560MB RSS and breaks the multi-scale performance suite's memory budgets;
+# sm loads ~40MB and detects the same common entities. Built once per process.
+_NLP_CONF = {
+    "nlp_engine_name": "spacy",
+    "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
+}
+
 _engines: Optional[tuple] = None
 
 
@@ -15,7 +20,11 @@ def _get_engines() -> tuple:
     """Return the process-wide (analyzer, anonymizer) pair, building on first use."""
     global _engines
     if _engines is None:
-        _engines = (AnalyzerEngine(), AnonymizerEngine())
+        nlp_engine = NlpEngineProvider(nlp_engine_configuration=_NLP_CONF).create_engine()
+        _engines = (
+            AnalyzerEngine(nlp_engine=nlp_engine, supported_languages=["en"]),
+            AnonymizerEngine(),
+        )
     return _engines
 
 

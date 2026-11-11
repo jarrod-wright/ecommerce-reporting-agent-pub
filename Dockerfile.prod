@@ -17,7 +17,7 @@ RUN apt-get update && \
 RUN pip install --no-cache-dir poetry==1.8.3
 
 # Configure Poetry to not create virtual env (we'll manage it ourselves)
-ENV POETRY_VENV_IN_PROJECT=1 \
+ENV POETRY_VIRTUALENVS_IN_PROJECT=1 \
     POETRY_NO_INTERACTION=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
