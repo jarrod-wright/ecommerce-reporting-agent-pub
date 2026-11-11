@@ -21,7 +21,8 @@ def _get_engines() -> tuple:
     """Return the process-wide (analyzer, anonymizer) pair, building on first use."""
     global _engines
     if _engines is None:
-        nlp_engine = NlpEngineProvider(nlp_engine_configuration=_NLP_CONF).create_engine()
+        provider = NlpEngineProvider(nlp_engine_configuration=_NLP_CONF)
+        nlp_engine = provider.create_engine()
         _engines = (
             AnalyzerEngine(nlp_engine=nlp_engine, supported_languages=["en"]),
             AnonymizerEngine(),
