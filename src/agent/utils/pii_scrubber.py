@@ -1,6 +1,22 @@
+from typing import Optional
+
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
+
+# The analyzer loads a heavy NLP model on first construction (~hundreds of MB);
+# build it once per process and reuse it. The multi-scale performance suite
+# measures process RSS, so repeated engine construction would break the memory
+# budgets.
+_engines: Optional[tuple] = None
+
+
+def _get_engines() -> tuple:
+    """Return the process-wide (analyzer, anonymizer) pair, building on first use."""
+    global _engines
+    if _engines is None:
+        _engines = (AnalyzerEngine(), AnonymizerEngine())
+    return _engines
 
 
 def scrub_text_for_pii(text: str) -> str:
@@ -13,9 +29,7 @@ def scrub_text_for_pii(text: str) -> str:
     Returns:
         Text with PII replaced by entity type placeholders
     """
-    # Initialize engines
-    analyzer = AnalyzerEngine()
-    anonymizer = AnonymizerEngine()
+    analyzer, anonymizer = _get_engines()
 
     # Find PII entities in the text
     results = analyzer.analyze(text=text, language='en')
