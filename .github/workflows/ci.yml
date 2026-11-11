@@ -31,3 +31,28 @@ jobs:
         # Test-suite security keys are provisioned by tests/conftest.py (demo
         # values) — no real secrets are required or referenced in CI.
         run: poetry run pytest
+  compose:
+    # Plan step 1 done-when: a CI job runs compose and a smoke request passes.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare .env from example
+        run: cp .env.example .env
+
+      - name: Build and start (docker compose up --build)
+        run: docker compose up --build -d
+
+      - name: Smoke request
+        run: |
+          for i in $(seq 1 45); do
+            if curl -fsS http://localhost:8080/health > /dev/null 2>&1; then
+              echo "smoke OK"; exit 0
+            fi
+            sleep 2
+          done
+          echo "smoke request failed"; docker compose logs --tail 100; exit 1
+
+      - name: Stop
+        if: always()
+        run: docker compose down

@@ -7,8 +7,24 @@ import structlog
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from agent.models.state import ReportingAgentState
+from agent.utils.pii_scrubber import scrub_text_for_pii
 
 _RATE_HINTS = ("rate", "ratio", "percent", "pct", "share")
+
+
+def _scrub_pii(value: Any) -> Any:
+    """Recursively scrub PII from string values in the insights payload.
+
+    Insights are LLM-produced from customer data; the report path scrubs them
+    before render so no customer record text reaches the PDF (data-blind default).
+    """
+    if isinstance(value, str):
+        return scrub_text_for_pii(value)
+    if isinstance(value, dict):
+        return {k: _scrub_pii(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_scrub_pii(v) for v in value]
+    return value
 
 
 def _format_metric_value(value: Any, name: str = "") -> str:
@@ -88,7 +104,7 @@ def compile_report_node(state: ReportingAgentState) -> Dict[str, Any]:
 
         # Render the template with insights and visualization data
         rendered_html = template.render(
-            insights=generated_insights,
+            insights=_scrub_pii(generated_insights),
             visualizations=visualization_filepaths,
             report_config=state.report_config,
         )
