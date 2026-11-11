@@ -960,14 +960,14 @@ gmpy = ["gmpy"]
 gmpy2 = ["gmpy2"]
 
 [[package]]
-name = "en-core-web-sm"
+name = "en-core-web-md"
 version = "3.7.1"
 description = "English pipeline optimized for CPU. Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer."
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "en_core_web_sm-3.7.1-py3-none-any.whl", hash = "sha256:86cc141f63942d4b2c5fcee06630fd6f904788d2f0ab005cce45aadb8fb73889"},
+    {file = "en_core_web_md-3.7.1-py3-none-any.whl", hash = "sha256:6a0f857a2b4d219c6fa17d455f82430b365bf53171a2d919b9376e5dc9be032e"},
 ]
 
 [package.dependencies]
@@ -975,7 +975,7 @@ spacy = ">=3.7.2,<3.8.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl"
+url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.7.1/en_core_web_md-3.7.1-py3-none-any.whl"
 
 [[package]]
 name = "fastapi"
@@ -6196,4 +6196,4 @@ cffi = ["cffi (>=1.17) ; python_version >= \"3.13\" and platform_python_implemen
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "a469c2e372ea74f23c765acae60747199652ae7d2167537e02475c5720058846"
+content-hash = "ae0cf579b799e852bfdb87fd72b7123b0d4c0d768fe3ee4815972fc9dc7d5422"
