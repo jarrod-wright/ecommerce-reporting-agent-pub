@@ -3,25 +3,35 @@ Multi-Scale Performance Testing Framework for ERA System
 
 Systematic performance testing using TDG-generated datasets across multiple scales
 to validate ERA performance, identify bottlenecks, and ensure SLA compliance.
+
+Memory measurement method of record (BLD-1271 ruling): each scale's workflow runs
+in a dedicated subprocess (tests/performance/workflow_subprocess.py) that imports
+only the workflow and initializes the production PII scrubber. The asserted number
+is the subprocess's true peak RSS — independent of the test-suite process, and
+inclusive of the en_core_web_md model the deployed service carries.
 """
 
+import json
+import os
+import pickle
+import subprocess
+import sys
+import tempfile
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict
 
 import pandas as pd
-import psutil
-
-from agent.graph.process_data_node import process_data_node
 
 # Import ERA components
-from agent.models.state import ReportingAgentState
 from config.era_schema_mapper import ERASchemaMapper
 from test_data_generator.core.generator import TestDataGenerator
 from test_data_generator.poc.minimal_generator import MinimalGenerator
 
 # Import TDG components
 from test_data_generator.poc.pii_sanitization_poc import PIISanitizationPOC
+from tests.performance.workflow_subprocess import METRICS_PREFIX
 
 
 @dataclass
@@ -149,6 +159,25 @@ class MultiScalePerformanceFramework:
             }
         }
 
+    def _serialize_dataset(self, era_dataset: Dict[str, Any], scale_name: str) -> str:
+        """Pickle the generated dataset for the workflow subprocess."""
+        fd, path = tempfile.mkstemp(prefix=f"era_{scale_name}_", suffix=".pkl")
+        with os.fdopen(fd, "wb") as fh:
+            pickle.dump(era_dataset, fh)
+        return path
+
+    def _parse_subprocess_metrics(self, stdout: str) -> Dict[str, float]:
+        """Extract the metrics line the workflow subprocess prints."""
+        for line in stdout.splitlines():
+            if line.startswith(METRICS_PREFIX):
+                metrics = json.loads(line[len(METRICS_PREFIX):])
+                return {
+                    "baseline_mb": float(metrics["baseline_mb"]),
+                    "peak_mb": float(metrics["peak_mb"]),
+                    "era_execution_time_s": float(metrics["era_execution_time_s"]),
+                }
+        raise RuntimeError(f"workflow subprocess printed no metrics line; stdout tail: {stdout[-300:]}")
+
     def execute_scale_benchmark(self, scale_name: str) -> PerformanceMetrics:
         """Execute complete ERA workflow at specified scale."""
         scale_config = self.scale_matrix[scale_name]
@@ -169,41 +198,41 @@ class MultiScalePerformanceFramework:
         dataset_generation_time = time.perf_counter() - dataset_start_time
         print(f"Dataset generation completed in {dataset_generation_time:.2f} seconds")
 
-        # Execute ERA workflow with performance monitoring
-        era_start_time = time.perf_counter()
-        memory_start = psutil.Process().memory_info().rss / 1024 / 1024
-
+        # Execute ERA workflow with performance monitoring.
+        # Measurement method of record (BLD-1271): the workflow runs in a
+        # dedicated subprocess (tests/performance/workflow_subprocess.py)
+        # that imports only the workflow and initializes the production PII
+        # scrubber. The budget number is that subprocess's true peak RSS —
+        # suite-independent and inclusive of the en_core_web_md model the
+        # deployed service carries.
+        dataset_path = self._serialize_dataset(era_dataset, scale_name)
         try:
-            # Create ERA state with generated data
-            era_state = ReportingAgentState(
-                report_config={"date_range": "2024-01-01 to 2024-12-31"},
-                raw_shopify_data=era_dataset['shopify_orders'].to_dict('records'),
-                raw_ga4_data=era_dataset['ga4_sessions'].to_dict('records')
+            subprocess_result = subprocess.run(
+                [sys.executable, "-m", "tests.performance.workflow_subprocess", str(dataset_path)],
+                capture_output=True,
+                text=True,
+                cwd=str(Path(__file__).resolve().parents[2]),
+                timeout=scale_config['target_latency'] * 4,
+                check=False,
             )
+        finally:
+            Path(dataset_path).unlink(missing_ok=True)
 
-            # Execute ERA processing nodes
-            print("Executing ERA data processing...")
-            processed_state_updates = process_data_node(era_state)
+        if subprocess_result.returncode != 0:
+            tail = (subprocess_result.stderr or "")[-500:]
+            raise RuntimeError(f"ERA workflow subprocess failed (rc={subprocess_result.returncode}): {tail}")
 
-            # Update state with processed data
-            for key, value in processed_state_updates.items():
-                setattr(era_state, key, value)
-
-            print("ERA processing completed successfully")
-
-        except Exception as e:
-            print(f"ERA processing failed: {e}")
-            # Continue with metrics collection even if processing fails
-
-        era_execution_time = time.perf_counter() - era_start_time
-        memory_peak = psutil.Process().memory_info().rss / 1024 / 1024
+        workflow_metrics = self._parse_subprocess_metrics(subprocess_result.stdout)
+        era_execution_time = workflow_metrics["era_execution_time_s"]
+        memory_baseline = workflow_metrics["baseline_mb"]
+        memory_peak = workflow_metrics["peak_mb"]
 
         print(f"ERA execution completed in {era_execution_time:.2f} seconds")
-        print(f"Memory usage: {memory_start:.1f}MB -> {memory_peak:.1f}MB")
+        print(f"Workflow subprocess memory: baseline {memory_baseline:.1f}MB, peak {memory_peak:.1f}MB (true peak incl. scrubber model)")
 
         # Calculate performance metrics
         total_records = scale_config['customers'] + scale_config['orders'] + scale_config['ga4_sessions']
-        memory_growth = memory_peak - memory_start
+        memory_growth = memory_peak - memory_baseline
         total_end_to_end_time = dataset_generation_time + era_execution_time
 
         sla_compliance = era_execution_time <= scale_config['target_latency']
