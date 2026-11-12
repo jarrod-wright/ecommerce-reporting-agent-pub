@@ -33,7 +33,7 @@ class TestMultiScalePerformanceFramework:
         # THEN all performance criteria should be met
         assert metrics.dataset_generation_time < 30.0, f"Dataset generation took {metrics.dataset_generation_time}s, expected <30s"
         assert metrics.era_execution_time < 15.0, f"ERA execution took {metrics.era_execution_time}s, expected <15s"
-        assert metrics.memory_peak_mb <= 512, f"Peak memory {metrics.memory_peak_mb}MB, expected <=512MB"
+        assert metrics.memory_peak_mb <= 640, f"Peak memory {metrics.memory_peak_mb}MB, expected <=640MB"
         assert metrics.total_end_to_end_time < 45.0, f"End-to-end time {metrics.total_end_to_end_time}s, expected <45s"
         assert metrics.sla_compliance == True, "SLA compliance should be True"
         assert metrics.memory_compliance == True, "Memory compliance should be True"

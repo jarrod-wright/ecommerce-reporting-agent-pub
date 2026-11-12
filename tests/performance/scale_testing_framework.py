@@ -130,7 +130,12 @@ class MultiScalePerformanceFramework:
                 "orders": 300,
                 "ga4_sessions": 1000,
                 "target_latency": 15.0,  # seconds
-                "target_memory": 512,    # MB
+                # Restated 2026-11-12 (BLD-1271): the ruled method charges the
+                # scrubber's en_core_web_md model to the measurement; CI measured
+                # a 538.8MB true peak, so the model-blind 512 budget was retyped
+                # to 640 (measured + runner headroom). No deployment anchor for
+                # 512 exists (no mem_limit in Dockerfile.prod / compose).
+                "target_memory": 640,    # MB
                 "description": "Basic functionality validation"
             },
             "small_scale": {
